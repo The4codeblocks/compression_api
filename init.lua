@@ -10,6 +10,12 @@ To add your own nodes that you want to compress further, you make a table like t
 	<for every node you want compressed>
 },
 and append it to the to_compress table in the Config section.
+
+You must also add the mod used to the mod.conf's optional_depends section.
+
+LIMITATIONS:
+Only works with single-image textures with identical names to the itemstring.
+Pull requests are welcome.
 ]]
 
 --Config
@@ -25,14 +31,17 @@ to_compress = {
 maxlvl = 5
 
 --Main
-register_compressed = function(node, name, level, already_compressed)
+register_compressed = function(node, name, level, already_compressed, displayname)
 	texture = node..".png"
 	if level > already_compressed then
 		for _=0, level - already_compressed, 1 do
-			texture
+			texture = texture.."^compression_darken.png"
 		end
 	end
-	minetest.register_node(name)
+	minetest.register_node(name, {
+		description = displayname
+		tiles = {texture}
+	})
 end
 
 register_compresseds = function(mod, table)
@@ -44,7 +53,7 @@ register_compresseds = function(mod, table)
 			else
 				name = name.."_compressed_level_"..level
 			end
-			register_compressed(node.node, name, level, node.already_compressed)
+			register_compressed(node.node, name, level, node.already_compressed, node.displayname)
 		end
 	end	
 end
