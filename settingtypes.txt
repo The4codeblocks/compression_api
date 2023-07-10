@@ -1,1 +1,1 @@
-
+max_compression_level (Maximum compression level for "compression") int 1
