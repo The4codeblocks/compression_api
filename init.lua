@@ -32,11 +32,9 @@ if minetest.get_modpath("moreblocks") then
 		{already_compressed = 1, node = "dirt_compressed"},
 	}
 else
-	table.move(to_compress["default"], 1, 3, 3, {
-		{already_compressed = 0, node = "cobblestone"},
-		{already_compressed = 0, node = "desert_cobblestone"},
-		{already_compressed = 0, node = "dirt"},
-	})
+	to_compress["default"][3] = {already_compressed = 0, node = "cobble"}
+	to_compress["default"][4] = {already_compressed = 0, node = "desert_cobble"}
+	to_compress["default"][5] = {already_compressed = 0, node = "dirt"}
 end
 
 --Settings
