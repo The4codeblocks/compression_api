@@ -14,8 +14,7 @@ and append it to the to_compress table in the Config section.
 You must also add the mod used to the mod.conf's optional_depends section.
 
 LIMITATIONS:
-Only works with single-image textures with identical names to the itemstring.
-Pull requests are welcome.
+Only works with single-image textures with identical names to the itemstring; Pull requests are welcome.
 ]]
 
 --Config
@@ -39,7 +38,7 @@ register_compressed = function(node, name, level, already_compressed, displaynam
 		end
 	end
 	minetest.register_node(name, {
-		description = displayname
+		description = displayname,
 		tiles = {texture}
 	})
 end
