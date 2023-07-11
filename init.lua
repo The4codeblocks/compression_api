@@ -27,7 +27,7 @@ to_compress = {
 }
 
 --Settings
-maxlvl = minetest.settings:get(max_compression_level)
+maxlvl = tonumber(minetest.settings:get("max_compression_level") or 1)
 
 --Main
 register_compressed = function(node, name, level, already_compressed, displayname)
@@ -43,9 +43,9 @@ register_compressed = function(node, name, level, already_compressed, displaynam
 	})
 end
 
-register_compresseds = function(mod, table)
+register_compression = function(mod, table)
 	for _, node in ipairs(table) do
-		for level = node.already_compressed+1, maxlvl, 1
+		for level = node.already_compressed+1, maxlvl, 1 do
 			name = "compression:"..mod.."_"..node.node
 			if node.already_compressed then
 				name = name.."_level_"..level
