@@ -60,7 +60,7 @@ end
 register_compressed = function(node, name, level, mod, subordinate)
 	node_groups = {compressed = level}
 	for key, value in pairs(node.groups) do node_groups[key] = value end
-	if node.already_compressed ~= 0 then node.displayname = "Compressed "..node.displayname
+	if node.already_compressed ~= 0 then node.displayname = "Compressed "..node.displayname end
 	minetest.register_node(name, {
 		description = node.displayname.." (Level "..level..") (x"..(9^level)..")",
 		tiles = darken_tiles(node.tiles, level-node.already_compressed),
