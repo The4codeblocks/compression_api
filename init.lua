@@ -28,7 +28,7 @@ to_compress = {
 }
 
 --Settings
-maxlvl = 5
+maxlvl = minetest.settings:get(max_compression_level)
 
 --Main
 register_compressed = function(node, name, level, already_compressed, displayname)
