@@ -3,8 +3,8 @@
 Configuration:
 To add your own nodes that you want to compress further, you make a table like this:
 <modname> = {
-	{already_compressed = <how many times your final compression tier has been compressed, 0 if no compression>, node = <your final tier of compression's itemstring>, displayname = <the node's original display name>},
-	{already_compressed = <repeat>, node = <repeat>, displayname = <repeat>},
+	{already_compressed = <how many times your final compression tier has been compressed, 0 if no compression>, node = <your final tier of compression's itemstring>},
+	{already_compressed = <repeat>, node = <repeat>},
 	.
 	.
 	<for every node you want compressed>
@@ -14,53 +14,95 @@ and append it to the to_compress table in the Config section.
 You must also add the mod used to the mod.conf's optional_depends section.
 
 LIMITATIONS:
-Only works with single-image textures with identical names to the itemstring.
-Pull requests are welcome.
+Only works with single-image textures with identical names to the itemstring (FIXED); Pull requests are welcome.
 ]]
 
 --Config
 to_compress = {
 	moreblocks = {
-		{already_compressed = 1, node = "cobble_compressed", displayname = "Compressed Cobblestone"},
-		{already_compressed = 1, node = "desert_cobble_compressed", displayname = "Compressed Desert Cobblestone"},
-		{already_compressed = 1, node = "dirt_compressed", displayname = "Compressed Dirt"},
+		{already_compressed = 1, node = "cobble_compressed"},
+		{already_compressed = 1, node = "desert_cobble_compressed"},
+		{already_compressed = 1, node = "dirt_compressed"},
 	},
+	default = {
+		{already_compressed = 0, node = "stone"},
+		{already_compressed = 0, node = "desert_stone"}
+	}
 }
 
 --Settings
 maxlvl = tonumber(minetest.settings:get("max_compression_level") or 1)
 
 --Main
-register_compressed = function(node, name, level, already_compressed, displayname, mod)
-	texture = node..".png"
-	if level > already_compressed then
-		for _=0, level - already_compressed, 1 do
-			texture = texture.."^compression_darken.png"
+darken_tiles = function(tiles, int--[[Can't find a good name]])
+	if int>0 then
+		for key, tile in pairs(tiles) do
+			for _=1, int, 1 do
+				if _ <= tonumber(1 or 5) then
+					tile = tile.."^compression_darken.png"
+				end
+			end
+			tiles[key] = tile
 		end
-		texture = mod.."_"..texture
+		return tiles
 	end
+end
+register_compressed = function(node, name, level, mod, subordinate)
+	node_groups = {compressed = level}
+	for key, value in pairs(node.groups) do node_groups[key] = value end
 	minetest.register_node(name, {
-		description = displayname,
-		tiles = {texture}
+		description = node.displayname.." (Level "..level..") (x"..(9^level)..")",
+		tiles = darken_tiles(node.tiles, level-node.already_compressed),
+		groups = node_groups,
+		sounds = node.sounds,
+	})
+	minetest.register_craft({
+		type = "shapeless",
+		recipe = {name},
+		output = subordinate.." 9",
+	})
+	minetest.register_craft({
+		type = "shapeless",
+		recipe = {
+			subordinate,
+			subordinate,
+			subordinate,
+			subordinate,
+			subordinate,
+			subordinate,
+			subordinate,
+			subordinate,
+			subordinate,
+		},
+		output = name,
 	})
 end
 
-register_compression = function(mod, table)
-	for _, node in ipairs(table) do
+register_compression = function(mod, node_table)
+	for _, node in ipairs(node_table) do
+		node_name = mod..":"..node.node
+		initial_node = minetest.registered_nodes[node_name]
+		node.displayname = initial_node.description
+		node.groups = initial_node.groups
+		node.tiles = initial_node.tiles
+		node.sounds = initial_node.sounds
 		for level = node.already_compressed+1, maxlvl, 1 do
+			if node.node ~= prior_node then name = nil end
+			prior_node = node.node
+			subordinate = name or node_name
 			name = "compression:"..mod.."_"..node.node
 			if node.already_compressed then
 				name = name.."_level_"..level
 			else
 				name = name.."_compressed_level_"..level
 			end
-			register_compressed(node.node, name, level, node.already_compressed, node.displayname, mod)
+			register_compressed(node, name, level, mod, subordinate)
 		end
 	end	
 end
 
-for mod, table in pairs(to_compress) do
+for mod, node_table in pairs(to_compress) do
 	if minetest.get_modpath(mod) then
-		register_compression(mod, table)
+		register_compression(mod, node_table)
 	end
 end
