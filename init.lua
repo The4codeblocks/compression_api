@@ -26,13 +26,13 @@ to_compress = {
 }
 
 if minetest.get_modpath("moreblocks") then
-	to_compress[moreblocks] = {
+	to_compress["moreblocks"] = {
 		{already_compressed = 1, node = "cobble_compressed"},
 		{already_compressed = 1, node = "desert_cobble_compressed"},
 		{already_compressed = 1, node = "dirt_compressed"},
 	}
 else
-	table.move(to_compress[default], 1, 3, 3, {
+	table.move(to_compress["default"], 1, 3, 3, {
 		{already_compressed = 0, node = "cobblestone"},
 		{already_compressed = 0, node = "desert_cobblestone"},
 		{already_compressed = 0, node = "dirt"},
