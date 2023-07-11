@@ -38,7 +38,7 @@ else
 end
 
 --Settings
-maxlvl = tonumber(minetest.settings:get("max_compression_level") or 1)
+maxlvl = tonumber(minetest.settings:get("max_compression_level") or 10)
 
 --Main
 darken_tiles = function(tiles, int--[[Can't find a good name]])
