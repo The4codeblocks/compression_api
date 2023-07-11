@@ -44,7 +44,7 @@ register_compressed = function(node, name, level, already_compressed, displaynam
 end
 
 register_compresseds = function(mod, table)
-	for _ node in ipairs(table) do
+	for _, node in ipairs(table) do
 		for level = node.already_compressed+1, maxlvl, 1
 			name = "compression:"..mod.."_"..node.node
 			if node.already_compressed then
