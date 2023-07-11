@@ -14,7 +14,8 @@ and append it to the to_compress table in the Config section.
 You must also add the mod used to the mod.conf's optional_depends section.
 
 LIMITATIONS:
-Only works with single-image textures with identical names to the itemstring; Pull requests are welcome.
+Only works with single-image textures with identical names to the itemstring.
+Pull requests are welcome.
 ]]
 
 --Config
@@ -30,12 +31,13 @@ to_compress = {
 maxlvl = tonumber(minetest.settings:get("max_compression_level") or 1)
 
 --Main
-register_compressed = function(node, name, level, already_compressed, displayname)
+register_compressed = function(node, name, level, already_compressed, displayname, mod)
 	texture = node..".png"
 	if level > already_compressed then
 		for _=0, level - already_compressed, 1 do
 			texture = texture.."^compression_darken.png"
 		end
+		texture = mod.."_"..texture
 	end
 	minetest.register_node(name, {
 		description = displayname,
@@ -52,7 +54,7 @@ register_compression = function(mod, table)
 			else
 				name = name.."_compressed_level_"..level
 			end
-			register_compressed(node.node, name, level, node.already_compressed, node.displayname)
+			register_compressed(node.node, name, level, node.already_compressed, node.displayname, mod)
 		end
 	end	
 end
