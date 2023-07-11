@@ -37,7 +37,7 @@ maxlvl = tonumber(minetest.settings:get("max_compression_level") or 1)
 darken_tiles = function(tiles, int--[[Can't find a good name]])
 	if int>0 then
 		for key, tile in pairs(tiles) do
-			if type(tile) = "table" then
+			if type(tile) == "table" then
 				error("\nTable found in texture.\nTexture found incompatible.")
 			end
 			for _=1, int, 1 do
