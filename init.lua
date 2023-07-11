@@ -60,7 +60,6 @@ end
 register_compressed = function(node, name, level, mod, subordinate)
 	node_groups = {compressed = level}
 	for key, value in pairs(node.groups) do node_groups[key] = value end
-	if node.already_compressed == 0 then node.displayname = "Compressed "..node.displayname end
 	minetest.register_node(name, {
 		description = node.displayname.." (Level "..level..") (x"..(9^level)..")",
 		tiles = darken_tiles(node.tiles, level-node.already_compressed),
@@ -94,6 +93,7 @@ register_compression = function(mod, node_table)
 		node_name = mod..":"..node.node
 		initial_node = minetest.registered_nodes[node_name]
 		node.displayname = initial_node.description
+		if node.already_compressed == 0 then node.displayname = "Compressed "..node.displayname end
 		node.groups = initial_node.groups
 		node.tiles = initial_node.tiles
 		node.sounds = initial_node.sounds
@@ -103,9 +103,9 @@ register_compression = function(mod, node_table)
 			subordinate = name or node_name
 			name = "compression:"..mod.."_"..node.node
 			if node.already_compressed == 0 then
-				name = name.."_level_"..level
-			else
 				name = name.."_compressed_level_"..level
+			else
+				name = name.."_level_"..level
 			end
 			register_compressed(node, name, level, mod, subordinate)
 		end
