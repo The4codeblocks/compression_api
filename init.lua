@@ -19,16 +19,25 @@ Table-based textures (default:dirt_with_grass has them for example) are incompat
 
 --Config
 to_compress = {
-	moreblocks = {
-		{already_compressed = 1, node = "cobble_compressed"},
-		{already_compressed = 1, node = "desert_cobble_compressed"},
-		{already_compressed = 1, node = "dirt_compressed"},
-	},
 	default = {
 		{already_compressed = 0, node = "stone"},
 		{already_compressed = 0, node = "desert_stone"}
-	}
+	},
 }
+
+if minetest.get_modpath("moreblocks") then
+	to_compress[moreblocks] = {
+		{already_compressed = 1, node = "cobble_compressed"},
+		{already_compressed = 1, node = "desert_cobble_compressed"},
+		{already_compressed = 1, node = "dirt_compressed"},
+	}
+else
+	table.move(to_compress[default], 1, 3, 3, {
+		{already_compressed = 1, node = "cobble_compressed"},
+		{already_compressed = 1, node = "desert_cobble_compressed"},
+		{already_compressed = 1, node = "dirt_compressed"},
+	})
+end
 
 --Settings
 maxlvl = tonumber(minetest.settings:get("max_compression_level") or 1)
