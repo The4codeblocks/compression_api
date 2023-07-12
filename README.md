@@ -1,5 +1,5 @@
 # compression
-A Minetest Game mod that increases compression levels for a few materials.
+A game-agnostic mod that increases compression levels for a few materials.
 
 Documentation? [init.lua](https://github.com/The4codeblocks/compression/blob/main/init.lua) has it. 
 
