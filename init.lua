@@ -24,8 +24,7 @@ to_compress = {
 		{already_compressed = 0, node = "desert_stone"}
 	},
 }
-
-if minetest.get_modpath("moreblocks") then
+if core.get_modpath("moreblocks") then
 	to_compress["moreblocks"] = {
 		{already_compressed = 1, node = "cobble_compressed"},
 		{already_compressed = 1, node = "desert_cobble_compressed"},
@@ -38,14 +37,14 @@ else
 end
 
 --Settings
-maxlvl = tonumber(minetest.settings:get("max_compression_level") or 10)
+maxlvl = tonumber(core.settings:get("max_compression_level") or 10)
 
 --Main
 darken_tiles = function(tiles, int--[[Can't find a good name]])
 	if int>0 then
 		for key, tile in pairs(tiles) do
 			if type(tile) == "table" then
-				error("\nTable found in texture.\nTexture found incompatible.")
+				error("\nTable found in texture.\nTexture deemed incompatible.")
 			end
 			for _=1, int, 1 do
 				if _ <= tonumber(1 or 5) then
@@ -60,18 +59,18 @@ end
 register_compressed = function(node, name, level, mod, subordinate)
 	node_groups = {compressed = level}
 	for key, value in pairs(node.groups) do node_groups[key] = value end
-	minetest.register_node(name, {
+	core.register_node(name, {
 		description = node.displayname.." (Level "..level..") (x"..(9^level)..")",
 		tiles = darken_tiles(node.tiles, level-node.already_compressed),
 		groups = node_groups,
 		sounds = node.sounds,
 	})
-	minetest.register_craft({
+	core.register_craft({
 		type = "shapeless",
 		recipe = {name},
 		output = subordinate.." 9",
 	})
-	minetest.register_craft({
+	core.register_craft({
 		type = "shapeless",
 		recipe = {
 			subordinate,
@@ -91,7 +90,7 @@ end
 register_compression = function(mod, node_table)
 	for _, node in ipairs(node_table) do
 		node_name = mod..":"..node.node
-		initial_node = minetest.registered_nodes[node_name]
+		initial_node = core.registered_nodes[node_name]
 		node.displayname = initial_node.description
 		if node.already_compressed == 0 then node.displayname = "Compressed "..node.displayname end
 		node.groups = initial_node.groups
@@ -113,7 +112,7 @@ register_compression = function(mod, node_table)
 end
 
 for mod, node_table in pairs(to_compress) do
-	if minetest.get_modpath(mod) then
+	if core.get_modpath(mod) then
 		register_compression(mod, node_table)
 	end
 end
