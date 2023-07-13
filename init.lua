@@ -1,3 +1,4 @@
+--Init
 local new_node = {info = {}}
 compression = {}
 
