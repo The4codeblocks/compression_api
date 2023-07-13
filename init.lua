@@ -1,3 +1,22 @@
+--Docs
+--[[
+Configuration:
+To add your own nodes that you want to compress further, you make a table like this:
+<modname> = {
+	{already_compressed = <how many times your final compression tier has been compressed, 0 if no compression>, node = <your final tier of compression's itemstring>},
+	{already_compressed = <repeat>, node = <repeat>},
+	.
+	.
+	<for every node you want compressed>
+},
+and append it to the to_compress table in the Config section.
+
+You must also add the mod used to the mod.conf's optional_depends section.
+
+LIMITATIONS:
+Table-based textures (default:dirt_with_grass has them for example) are incompatible and cause the mod to return an error; Pull requests are welcome.
+]]
+
 local new_node = {info = {}}
 compression = {}
 
@@ -67,7 +86,7 @@ compression.register_compressed_tiers = function(node)
 	for level = new_node.info.initial_compression+1, maxlvl, 1 do
 		if node ~= prior_node then new_node.info.name = nil end
 		local prior_node = node
-		if new_node.def.groups.compression == 0 then new_node.def.description = "Compressed "..new_node.def.description end
+		if new_node.info.initial_compression == 0 then new_node.def.description = "Compressed "..new_node.def.description end
 		new_node.info.subordinate = new_node.info.name or node
 		new_node.info.name = "compression:"..(node:gsub(":","_"))
 		if new_node.info.initial_compression == 0 then
@@ -83,8 +102,8 @@ compression.register_compressed_tiers = function(node)
 	end
 end
 
-compression.register_compressed_nodes = function(node_table)
-	for _, node in ipairs(node_table) do
+compression.register_compressed_nodes = function(nodes)
+	for _, node in ipairs(nodes) do
 		compression.register_compressed_tiers(node)
 	end
 end
