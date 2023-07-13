@@ -17,38 +17,37 @@ LIMITATIONS:
 Table-based textures (default:dirt_with_grass has them for example) are incompatible and cause the mod to return an error; Pull requests are welcome.
 ]]
 
---Config
-to_compress = {
-	default = {
-		{already_compressed = 0, node = "stone"},
-		{already_compressed = 0, node = "desert_stone"}
-	},
-}
-if core.get_modpath("moreblocks") then
-	to_compress["moreblocks"] = {
-		{already_compressed = 1, node = "cobble_compressed"},
-		{already_compressed = 1, node = "desert_cobble_compressed"},
-		{already_compressed = 1, node = "dirt_compressed"},
-	}
-else
-	to_compress["default"][3] = {already_compressed = 0, node = "cobble"}
-	to_compress["default"][4] = {already_compressed = 0, node = "desert_cobble"}
-	to_compress["default"][5] = {already_compressed = 0, node = "dirt"}
-end
+local new_node = {info = {}}
+compression = {}
 
 --Settings
 maxlvl = tonumber(core.settings:get("max_compression_level") or 10)
 
 --Main
-darken_tiles = function(tiles, int--[[Can't find a good name]])
-	if int>0 then
+table.copy = function(tbl)
+    local copy
+    if type(tbl) == "table" then
+        copy = {}
+        for orig_key, orig_value in next, tbl, nil do
+            copy[table.copy(orig_key)] = table.copy(orig_value)
+        end
+        setmetatable(copy, table.copy(getmetatable(tbl)))
+    else
+        copy = tbl
+    end
+    return copy
+end
+
+compression.darken_tiles = function(tiles, count)
+	if count>0 then
 		for key, tile in pairs(tiles) do
 			if type(tile) == "table" then
-				error("\nTable found in texture.\nTexture deemed incompatible.")
-			end
-			for _=1, int, 1 do
-				if _ <= tonumber(1 or 5) then
-					tile = tile.."^compression_darken.png"
+				tile = darken_tiles(tile, count)
+			else
+				for _=1, count, 1 do
+					if _ <= tonumber(1 or 5) then
+						tile = tile.."^compression_darken.png"
+					end
 				end
 			end
 			tiles[key] = tile
@@ -56,63 +55,55 @@ darken_tiles = function(tiles, int--[[Can't find a good name]])
 		return tiles
 	end
 end
-register_compressed = function(node, name, level, mod, subordinate)
-	node_groups = {compressed = level}
-	for key, value in pairs(node.groups) do node_groups[key] = value end
-	core.register_node(name, {
-		description = node.displayname.." (Level "..level..") (x"..(9^level)..")",
-		tiles = darken_tiles(node.tiles, level-node.already_compressed),
-		groups = node_groups,
-		sounds = node.sounds,
-	})
+register_compressed = function(node, new_node)
+	core.register_node(new_node.info.name, table.copy(new_node.def))
 	core.register_craft({
 		type = "shapeless",
-		recipe = {name},
-		output = subordinate.." 9",
+		recipe = {},
+		output = new_node.info.subordinate.." 9",
 	})
 	core.register_craft({
 		type = "shapeless",
 		recipe = {
-			subordinate,
-			subordinate,
-			subordinate,
-			subordinate,
-			subordinate,
-			subordinate,
-			subordinate,
-			subordinate,
-			subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
+			new_node.info.subordinate,
 		},
-		output = name,
+		output = new_node.info.name,
 	})
 end
 
-register_compression = function(mod, node_table)
-	for _, node in ipairs(node_table) do
-		node_name = mod..":"..node.node
-		initial_node = core.registered_nodes[node_name]
-		node.displayname = initial_node.description
-		if node.already_compressed == 0 then node.displayname = "Compressed "..node.displayname end
-		node.groups = initial_node.groups
-		node.tiles = initial_node.tiles
-		node.sounds = initial_node.sounds
-		for level = node.already_compressed+1, maxlvl, 1 do
-			if node.node ~= prior_node then name = nil end
-			prior_node = node.node
-			subordinate = name or node_name
-			name = "compression:"..mod.."_"..node.node
-			if node.already_compressed == 0 then
-				name = name.."_compressed_level_"..level
-			else
-				name = name.."_level_"..level
-			end
-			register_compressed(node, name, level, mod, subordinate)
+compression.register_compressed_tiers = function(node)
+	new_node.def = table.copy(core.registered_nodes[node])
+	new_node.info.initial_compression = new_node.def.groups.compressed or 0
+	new_node.info.original_description = new_node.def.description
+	for level = new_node.info.initial_compression+1, maxlvl, 1 do
+		if node ~= prior_node then new_node.info.name = nil end
+		local prior_node = node
+		if new_node.def.groups.compression == 0 then new_node.def.description = "Compressed "..new_node.def.description end
+		new_node.info.subordinate = new_node.info.name or node
+		new_node.info.name = "compression:"..(node:gsub(":","_"))
+		if new_node.info.initial_compression == 0 then
+			new_node.info.name = new_node.info.name.."_compressed_level_"..level
+		else
+			new_node.info.name = new_node.info.name.."_level_"..level
 		end
-	end	
+		new_node.def.groups.compressed = level
+		new_node.def.description = new_node.info.original_description.." (Level "..level..") (x"..(9^level)..")"
+		new_node.def.tiles = compression.darken_tiles(new_node.def.tiles, level-new_node.info.initial_compression)
+		new_node.def.drop = node
+		register_compressed(node, new_node)
+	end
 end
 
-for mod, node_table in pairs(to_compress) do
-	if core.get_modpath(mod) then
-		register_compression(mod, node_table)
+compression.register_compressed_nodes = function(node_table)
+	for _, node in ipairs(node_table) do
+		compression.register_compressed_tiers(node)
 	end
 end
