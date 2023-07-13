@@ -1,6 +1,4 @@
 # compression
-A game-agnostic mod that increases compression levels for a few materials.
+An API the provides functions to increase compression levels for set materials.
 
-Documentation? [init.lua](https://github.com/The4codeblocks/compression/blob/main/init.lua) has it. 
-
-Settings: "Maximum compression level" changes how much you can compress set materials in the compression list.
+Settings: "Maximum compression level" changes how much each provided material is compressed.
