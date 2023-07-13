@@ -7,4 +7,5 @@
 
 `compression.register_compressed_nodes(nodes)`: Registers every node in the provided table. (eg. `{"default:cobble", "default:desert_cobble"}`)
 
+## Settings
 `max_compression_level`: The maximum compression tier; Default is 10.
