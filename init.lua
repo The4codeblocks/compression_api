@@ -1,22 +1,3 @@
---Docs
---[[
-Configuration:
-To add your own nodes that you want to compress further, you make a table like this:
-<modname> = {
-	{already_compressed = <how many times your final compression tier has been compressed, 0 if no compression>, node = <your final tier of compression's itemstring>},
-	{already_compressed = <repeat>, node = <repeat>},
-	.
-	.
-	<for every node you want compressed>
-},
-and append it to the to_compress table in the Config section.
-
-You must also add the mod used to the mod.conf's optional_depends section.
-
-LIMITATIONS:
-Table-based textures (default:dirt_with_grass has them for example) are incompatible and cause the mod to return an error; Pull requests are welcome.
-]]
-
 local new_node = {info = {}}
 compression = {}
 
