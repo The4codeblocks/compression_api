@@ -3,10 +3,10 @@ local new_node = {info = {}}
 compression = {}
 
 --Settings
-maxlvl = tonumber(core.settings:get("max_compression_level") or 10)
+local maxlvl = tonumber(core.settings:get("max_compression_level") or 10)
 
 --Main
-table.copy = function(tbl)
+--[[table.copy = function(tbl) Do I need this?
 	local copy
 	if type(tbl) == "table" then
 		copy = {}
@@ -18,10 +18,11 @@ table.copy = function(tbl)
 		copy = tbl
 	end
 	return copy
-end
+end]]
 
 compression.darken_tiles = function(tiles, count)
 	if count>0 then
+		local tiles = {}
 		for key, tile in pairs(tiles) do
 			if type(tile) == "table" then
 				tile = compression.darken_tiles(tile, count)
