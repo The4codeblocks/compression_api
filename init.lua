@@ -22,7 +22,6 @@ end]]
 
 compression.darken_tiles = function(tiles, count)
 	if count>0 then
-		local tiles = {}
 		for key, tile in pairs(tiles) do
 			if type(tile) == "table" then
 				tile = compression.darken_tiles(tile, count)
