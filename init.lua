@@ -6,20 +6,6 @@ compression = {}
 local maxlvl = tonumber(core.settings:get("max_compression_level") or 10)
 
 --Main
---[[table.copy = function(tbl) Do I need this?
-	local copy
-	if type(tbl) == "table" then
-		copy = {}
-		for orig_key, orig_value in next, tbl, nil do
-			copy[table.copy(orig_key)] = table.copy(orig_value)
-		end
-		setmetatable(copy, table.copy(getmetatable(tbl)))
-	else
-		copy = tbl
-	end
-	return copy
-end]]
-
 compression.darken_tiles = function(tiles, count)
 	if count>0 then
 		for key, tile in pairs(tiles) do
