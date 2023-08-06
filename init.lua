@@ -12,8 +12,8 @@ compression.darken_tiles = function(tiles, count)
 			if type(tile) == "table" then
 				tile = compression.darken_tiles(tile, count)
 			else
-				for current_darken=1, count, 1 do
-					if current_darken <= tonumber(1 or 5) then
+				for _=1, count, 1 do
+					if _ <= tonumber(1 or 5) then
 						if type(tile) == "string" then tile = tile.."^compression_darken.png" end
 					end
 				end
@@ -53,7 +53,6 @@ compression.register_compressed_tiers = function(node)
 	new_node.info.initial_compression = new_node.def.groups.compressed or 0
 	new_node.info.original_description = new_node.def.description
 	for level = new_node.info.initial_compression+1, maxlvl, 1 do
-		if new_node.info.initial_compression == 0 then new_node.def.description = "Compressed "..new_node.def.description end
 		new_node.info.subordinate = new_node.info.name or node
 		new_node.info.name = "compression:"..(node:gsub(":","_"))
 		if new_node.info.initial_compression == 0 then
@@ -63,6 +62,7 @@ compression.register_compressed_tiers = function(node)
 		end
 		new_node.def.groups.compressed = level
 		new_node.def.description = new_node.info.original_description.." (Level "..level..") (x"..(9^level)..")"
+		if new_node.info.initial_compression == 0 then new_node.def.description = "Compressed "..new_node.def.description end
 		new_node.def.tiles = compression.darken_tiles(new_node.def.tiles, level-new_node.info.initial_compression)
 		new_node.def.drop = new_node.info.name
 		register_compressed(new_node)
@@ -71,6 +71,8 @@ end
 
 compression.register_compressed_nodes = function(nodes)
 	for _, node in ipairs(nodes) do
-		compression.register_compressed_tiers(node)
+		if core.registered_nodes[node] then
+			compression.register_compressed_tiers(node)
+		end
 	end
 end
