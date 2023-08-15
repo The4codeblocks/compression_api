@@ -7,14 +7,14 @@ local maxlvl = tonumber(core.settings:get("max_compression_level") or 10)
 
 --Main
 compression.darken_tiles = function(tiles, count)
-	if count>0 then
+	if count > 0 then
 		for key, tile in pairs(tiles) do
 			if type(tile) == "table" then
 				tile = compression.darken_tiles(tile, count)
 			else
 				for iteration = 1, count, 1 do
 					if iteration <= tonumber(1 or 5) then
-						if type(tile) == "string" then tile = tile.."^compression_darken.png" end
+						if type(tile) == "string" then tile = tile .. "^compression_darken.png" end
 					end
 				end
 			end
@@ -26,24 +26,24 @@ end
 register_compressed = function(new_node)
 	core.register_node(new_node.info.name, table.copy(new_node.def))
 	core.register_craft({
-		type = "shapeless",
-		recipe = {new_node.info.name},
-		output = new_node.info.subordinate.." 9",
+		type = "shapeless", 
+		recipe = {new_node.info.name}, 
+		output = new_node.info.subordinate .. " 9", 
 	})
 	core.register_craft({
-		type = "shapeless",
+		type = "shapeless", 
 		recipe = {
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-			new_node.info.subordinate,
-		},
-		output = new_node.info.name,
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+			new_node.info.subordinate, 
+		}, 
+		output = new_node.info.name, 
 	})
 end
 
@@ -52,17 +52,17 @@ compression.register_compressed_tiers = function(node)
 	new_node.def = table.copy(core.registered_nodes[node])
 	new_node.info.initial_compression = new_node.def.groups.compressed or 0
 	new_node.info.original_description = new_node.def.description
-	for level = new_node.info.initial_compression+1, maxlvl, 1 do
+	for level = new_node.info.initial_compression + 1, maxlvl, 1 do
 		new_node.info.subordinate = new_node.info.name or node
-		new_node.info.name = "compression:"..(node:gsub(":","_"))
+		new_node.info.name = "compression:" .. (node:gsub(":", "_"))
 		if new_node.info.initial_compression == 0 then
-			new_node.info.name = new_node.info.name.."_compressed_level_"..level
+			new_node.info.name = new_node.info.name .. "_compressed_level_" .. level
 		else
-			new_node.info.name = new_node.info.name.."_level_"..level
+			new_node.info.name = new_node.info.name .. "_level_" .. level
 		end
 		new_node.def.groups.compressed = level
-		new_node.def.description = new_node.info.original_description.." (Level "..level..") (x"..(9^level)..")"
-		if new_node.info.initial_compression == 0 then new_node.def.description = "Compressed "..new_node.def.description end
+		new_node.def.description = new_node.info.original_description .. " (Level " .. level .. ") (x" .. (9^level) .. ")"
+		if new_node.info.initial_compression == 0 then new_node.def.description = "Compressed " .. new_node.def.description end
 		new_node.def.tiles = compression.darken_tiles(new_node.def.tiles, level-new_node.info.initial_compression)
 		new_node.def.drop = new_node.info.name
 		register_compressed(new_node)
