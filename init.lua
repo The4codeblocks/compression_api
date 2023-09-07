@@ -2,9 +2,6 @@
 local new_node = {info = {}}
 compression = {}
 
---Settings
-local maxlvl = tonumber(core.settings:get("max_compression_level") or 10)
-
 --Main
 compression.darken_tiles = function(tiles, count)
 	if count > 0 then
@@ -23,7 +20,7 @@ compression.darken_tiles = function(tiles, count)
 		return tiles
 	end
 end
-register_compressed = function(new_node)
+local register_compressed = function(new_node)
 	core.register_node(new_node.info.name, table.copy(new_node.def))
 	core.register_craft({
 		type = "shapeless", 
@@ -47,7 +44,7 @@ register_compressed = function(new_node)
 	})
 end
 
-compression.register_compressed_tiers = function(node)
+compression.register_compressed_tiers = function(node, maxlvl)
 	new_node.info.name = nil
 	new_node.def = table.copy(core.registered_nodes[node])
 	new_node.info.initial_compression = new_node.def.groups.compressed or 0
@@ -69,10 +66,10 @@ compression.register_compressed_tiers = function(node)
 	end
 end
 
-compression.register_compressed_nodes = function(nodes)
+compression.register_compressed_nodes = function(nodes, maxlvl)
 	for _, node in ipairs(nodes) do
 		if core.registered_nodes[node] then
-			compression.register_compressed_tiers(node)
+			compression.register_compressed_tiers(node, maxlvl)
 		end
 	end
 end
