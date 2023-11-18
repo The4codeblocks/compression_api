@@ -8,12 +8,8 @@ compression.darken_tiles = function(tiles, count)
 		for key, tile in pairs(tiles) do
 			if type(tile) == "table" then
 				tile = compression.darken_tiles(tile, count)
-			else
-				for iteration = 1, count, 1 do
-					if iteration <= tonumber(1 or 5) then
-						if type(tile) == "string" then tile = tile .. "^compression_darken.png" end
-					end
-				end
+			elseif type(tile) == "string" then
+				tile = tile .. "^compression_darken.png"
 			end
 			tiles[key] = tile
 		end
